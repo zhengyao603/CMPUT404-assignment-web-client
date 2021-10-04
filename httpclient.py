@@ -86,7 +86,7 @@ class HTTPClient(object):
         print(port)
         print(path)
         print()
-        self.connect(addr, 80)
+        self.connect(addr, port)
         self.sendall("GET %s HTTP/1.1\r\nHost: %s\r\nAccept: text/html,text/css\r\nConnection: close\r\n\r\n" % (path, urllib.parse.urlparse(url)[1]))
         print(self.recvall(self.socket))
         self.close()
