@@ -73,11 +73,11 @@ class HTTPClient(object):
 
     def GET(self, url, args=None):
         # send GET request and recieve response from server
-        addr = urllib.parse.urlparse(url).geturl()
+        addr = urllib.parse.urlparse(url)[1]
         port = 80
         if (urllib.parse.urlparse(url).port):
             port = urllib.parse.urlparse(url).port
-        path = urllib.parse.urlparse(url).path
+        path = urllib.parse.urlparse(url)[2]
         print(addr)
         print(port)
         print(path)
