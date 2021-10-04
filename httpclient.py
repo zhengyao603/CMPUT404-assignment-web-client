@@ -74,12 +74,14 @@ class HTTPClient(object):
     def GET(self, url, args=None):
         # send GET request and recieve response from server
         addr = urllib.parse.urlparse(url).geturl()
-        port = urllib.parse.urlparse(url).port
+        port = 80
+        if (urllib.parse.urlparse(url).port):
+            port = urllib.parse.urlparse(url).port
         path = urllib.parse.urlparse(url).path
         print(addr)
         print(port)
         print(path)
-        self.connect(addr, port)
+        self.connect(addr, 80)
         self.sendall("GET %s HTTP/1.1\r\nHost: %s\r\nAccept: text/html,text/css\r\nConnection: close\r\n\r\n" % (path, urllib.parse.urlparse(url)[1]))
         print(self.recvall(self.socket))
         self.close()
