@@ -73,9 +73,13 @@ class HTTPClient(object):
 
     def GET(self, url, args=None):
         # send GET request and recieve response from server
-        ipaddr = urllib.parse.urlparse(url)[1]
-        path = urllib.parse.urlparse(url)[2]
-        self.connect(ipaddr, 80)
+        addr = urllib.parse.urlparse(url).geturl()
+        port = urllib.parse.urlparse(url).port
+        path = urllib.parse.urlparse(url).path
+        print(addr)
+        print(port)
+        print(path)
+        self.connect(addr, port)
         self.sendall("GET %s HTTP/1.1\r\nHost: %s\r\nAccept: text/html,text/css\r\nConnection: close\r\n\r\n" % (path, urllib.parse.urlparse(url)[1]))
         print(self.recvall(self.socket))
         self.close()
@@ -85,13 +89,13 @@ class HTTPClient(object):
         return HTTPResponse(code, body)
 
     def POST(self, url, args=None):
-        # send POST request and recieve response from server
-        ipaddr = urllib.parse.urlparse(url)[1]
-        path = urllib.parse.urlparse(url)[2]
-        self.connect(ipaddr, 80)
-        self.sendall("POST %s HTTP/1.1\r\nHost: %s\r\nContent-type:application/x-www-form-urlencoded\r\nContent-length:%d\r\n\r\n" % (path, urllib.parse.urlparse(url)[1], 0))
-        print(self.recvall(self.socket))
-        self.close()
+        # # send POST request and recieve response from server
+        # addr = urllib.parse.urlparse(url)[1]
+        # path = urllib.parse.urlparse(url)[2]
+        # self.connect(addr, 80)
+        # self.sendall("POST %s HTTP/1.1\r\nHost: %s\r\nContent-type:application/x-www-form-urlencoded\r\nContent-length:%d\r\n\r\n" % (path, urllib.parse.urlparse(url)[1], 0))
+        # print(self.recvall(self.socket))
+        # self.close()
 
         code = 500
         body = ""
