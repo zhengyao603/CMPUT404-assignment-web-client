@@ -44,13 +44,28 @@ class HTTPClient(object):
         return
 
     def get_code(self, data):
-        return None
+        data_list = data.split('\r\n')
+        code = data_list[0].split(' ')[1]
+        return int(code)
 
     def get_headers(self,data):
-        return None
+        header = []
+        data_list = data.split('\r\n')
+        for item in data_list:
+            if item == '':
+                break
+            header.append(item)
+        return '\r\n'.join(header)
 
     def get_body(self, data):
-        return None
+        data_list = data.split('\r\n')
+        index = 0
+        for item in data_list:
+            if item == '':
+                break
+            index += 1
+        body = data_list[index + 1]
+        return body
     
     def sendall(self, data):
         self.socket.sendall(data.encode('utf-8'))
@@ -82,30 +97,48 @@ class HTTPClient(object):
             elif (urllib.parse.urlparse(url).scheme == 'http'):
                 port = 80
         path = urllib.parse.urlparse(url).path
-        print(addr)
-        print(port)
-        print(path)
-        print()
+        if not path:
+            path = '/'
         self.connect(addr, port)
-        self.sendall("GET %s HTTP/1.1\r\nHost: %s\r\nAccept: text/html,text/css\r\nConnection: close\r\n\r\n" % (path, urllib.parse.urlparse(url)[1]))
-        print(self.recvall(self.socket))
+        self.sendall("GET %s HTTP/1.1\r\nHost: %s\r\nConnection: close\r\n\r\n" % (path, urllib.parse.urlparse(url)[1]))
+        response = self.recvall(self.socket)
         self.close()
 
-        code = 500
-        body = ""
+        # parse the response info
+        code = self.get_code(response)
+        body = self.get_body(response)
+
         return HTTPResponse(code, body)
 
     def POST(self, url, args=None):
-        # # send POST request and recieve response from server
-        # addr = urllib.parse.urlparse(url)[1]
-        # path = urllib.parse.urlparse(url)[2]
-        # self.connect(addr, 80)
-        # self.sendall("POST %s HTTP/1.1\r\nHost: %s\r\nContent-type:application/x-www-form-urlencoded\r\nContent-length:%d\r\n\r\n" % (path, urllib.parse.urlparse(url)[1], 0))
-        # print(self.recvall(self.socket))
-        # self.close()
+        # send POST request and recieve response from server
+        addr = urllib.parse.urlparse(url).netloc.split(':')[0]
+        if (urllib.parse.urlparse(url).port):
+            port = urllib.parse.urlparse(url).port
+        else:
+            if (urllib.parse.urlparse(url).scheme == 'https'):
+                port = 443
+            elif (urllib.parse.urlparse(url).scheme == 'http'):
+                port = 80
+        path = urllib.parse.urlparse(url).path
+        if not path:
+            path = '/'
+        # parse args and calculate length
+        length = 0
+        if args:
+            args = urllib.parse.urlencode(args)
+            length = len(args)
+        self.connect(addr, port)
+        self.sendall("POST %s HTTP/1.1\r\nHost: %s\r\nContent-type:application/x-www-form-urlencoded\r\nContent-length:%d\r\n\r\n" % (path, urllib.parse.urlparse(url)[1], length))
+        if args:
+            self.sendall(args)
+        response = self.recvall(self.socket)
+        self.close()
 
-        code = 500
-        body = ""
+        # parse the response info
+        code = self.get_code(response)
+        body = self.get_body(response)
+
         return HTTPResponse(code, body)
 
 
