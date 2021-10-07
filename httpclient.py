@@ -107,6 +107,10 @@ class HTTPClient(object):
         # parse the response info
         code = self.get_code(response)
         body = self.get_body(response)
+        header = self.get_headers(response)
+
+        print(header)
+        print(body)
 
         return HTTPResponse(code, body)
 
@@ -138,6 +142,10 @@ class HTTPClient(object):
         # parse the response info
         code = self.get_code(response)
         body = self.get_body(response)
+        header = self.get_headers(response)
+
+        print(header)
+        print(body)
 
         return HTTPResponse(code, body)
 
